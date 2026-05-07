@@ -1,0 +1,109 @@
+{
+  "name": "codesense",
+  "displayName": "CodeSense",
+  "description": "AI-powered Swiss Army knife for JS, Next.js and Java developers",
+  "version": "0.0.1",
+  "publisher": "your-publisher-id",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "CodeSense",
+      "properties": {
+        "codesense.geminiApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Gemini API anahtarınızı buraya girin. Google AI Studio'dan alabilirsiniz: https://aistudio.google.com"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "codesense.explainError",
+        "title": "Hatayı Açıkla",
+        "category": "CodeSense"
+      },
+      {
+        "command": "codesense.generateDoc",
+        "title": "Dokümantasyon Yaz",
+        "category": "CodeSense"
+      },
+      {
+        "command": "codesense.reviewCode",
+        "title": "Kodu Optimize Et",
+        "category": "CodeSense"
+      },
+      {
+        "command": "codesense.generateComponent",
+        "title": "Bileşen Üret",
+        "category": "CodeSense"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "submenu": "codesense.submenu",
+          "group": "codesense@1"
+        }
+      ],
+      "codesense.submenu": [
+        {
+          "command": "codesense.explainError",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codesense.generateDoc",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codesense.reviewCode",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "codesense.generateComponent"
+        }
+      ]
+    },
+    "submenus": [
+      {
+        "id": "codesense.submenu",
+        "label": "CodeSense 🧠"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "codesense.generateDoc",
+        "key": "ctrl+shift+d",
+        "mac": "cmd+shift+d",
+        "when": "editorHasSelection"
+      },
+      {
+        "command": "codesense.generateComponent",
+        "key": "ctrl+shift+g",
+        "mac": "cmd+shift+g"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3",
+    "@vscode/vsce": "^2.22.0",
+    "@types/mocha": "^10.0.0"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.7.0"
+  }
+}
