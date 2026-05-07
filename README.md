@@ -1,25 +1,160 @@
-# CodeSense
+# CodeSense 🧠
 
-CodeSense is a VS Code extension that provides AI-powered code analysis and insights directly in your editor.
+> **VS Code için AI destekli İsviçre Çakısı** — Google Gemini AI kullanarak kodlarını doğrudan editörün içinde analiz et, belgele, optimize et ve üret.
 
-## Features
+![Versiyon](https://img.shields.io/badge/versiyon-0.0.1-blue)
+![VS Code](https://img.shields.io/badge/VS%20Code-1.85%2B-blue?logo=visualstudiocode)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?logo=typescript)
+![Gemini](https://img.shields.io/badge/Gemini-AI-orange?logo=google)
+![Lisans](https://img.shields.io/badge/lisans-MIT-green)
 
-- AI-powered code understanding and analysis
-- Inline code suggestions and explanations
-- Seamless integration with your development workflow
+---
 
-## Requirements
+## ✨ Özellikler
 
-No additional requirements. Works out of the box with VS Code.
+### 🔴 Hata Çevirmen — `CodeSense: Hatayı Açıkla`
+Herhangi bir hata mesajını veya bozuk kodu seç, sağ tıkla ve anında sade Türkçe açıklama ile somut çözüm önerisi al.
 
-## Extension Settings
+### 📝 Dokümantasyon Üretici — `CodeSense: Dokümantasyon Yaz`
+Bir fonksiyon veya metot seç, CodeSense otomatik olarak JSDoc (JavaScript/TypeScript) veya Javadoc (Java) yorum bloğu yazar ve doğrudan kodunun üstüne ekler. Kopyala-yapıştır yok.
 
-This extension contributes the following settings:
+### ⚡ Kod İncelemeci — `CodeSense: Kodu Optimize Et`
+Herhangi bir kod bloğu seç, CodeSense yan yana diff görünümü açar — solda orijinal kodun, sağda optimize edilmiş versiyon ve her değişikliği açıklayan satır içi yorumlar.
 
-* `codesense.enable`: Enable/disable CodeSense.
+### 🚀 Bileşen Üretici — `CodeSense: Bileşen Üret`
+Klavye kısayoluna bas, isteğini sade dille yaz (örn. *"Next.js Tailwind navbar yap"*) ve CodeSense tam bileşeni üretip doğrudan imleç konumuna yapıştırır.
 
-## Release Notes
+---
 
-### 0.0.1
+## 🛠 Teknoloji Yığını
 
-Initial release of CodeSense.
+| Katman | Teknoloji |
+|---|---|
+| Dil | TypeScript 5.3 |
+| Çalışma Ortamı | Node.js |
+| Yapay Zeka Modeli | Google Gemini 1.5 Flash |
+| Editör API | VS Code Extension API |
+| Paket | `@google/generative-ai` |
+
+---
+
+## 📦 Kurulum
+
+### Gereksinimler
+- [Node.js](https://nodejs.org) (v18+)
+- [VS Code](https://code.visualstudio.com) (v1.85+)
+- Ücretsiz [Google AI Studio](https://aistudio.google.com) API anahtarı
+
+### Seçenek A — VSIX ile kur (önerilen)
+```bash
+code --install-extension codesense-0.0.1.vsix
+```
+Ya da **Eklentiler → ··· → VSIX'ten Yükle** seçeneğiyle dosyayı seç.
+
+### Seçenek B — Kaynak koddan çalıştır
+```bash
+git clone https://github.com/kullanici-adin/codesense.git
+cd codesense
+npm install
+npm run compile
+```
+Ardından VS Code'da **F5**'e bas, Extension Development Host açılır.
+
+---
+
+## 🔑 API Anahtarı Kurulumu
+
+1. [aistudio.google.com](https://aistudio.google.com) adresine git ve Google hesabınla giriş yap
+2. **Get API Key** → **Create API Key** tıkla (ücretsiz kullanım mevcut)
+3. Anahtarı kopyala
+4. VS Code'da: **Dosya → Tercihler → Ayarlar** → `codesense` ara
+5. **Codesense: Gemini Api Key** alanına yapıştır
+
+---
+
+## 🎮 Kullanım
+
+### Sağ Tık Menüsü ile
+Kodu seç → sağ tıkla → **CodeSense 🧠** alt menüsü
+
+### Klavye Kısayolları
+
+| Komut | Windows / Linux | Mac |
+|---|---|---|
+| Dokümantasyon Yaz | `Ctrl+Shift+D` | `Cmd+Shift+D` |
+| Bileşen Üret | `Ctrl+Shift+G` | `Cmd+Shift+G` |
+
+### Örnek Kullanımlar
+
+**React bileşeni üret:**
+1. Boş bir dosya aç
+2. `Ctrl+Shift+G` tuşuna bas
+3. Yaz: *"Next.js Tailwind CSS ile mobil menülü navbar"*
+4. Enter'a bas — kod imlece yapıştırılır
+
+**Fonksiyon belgele:**
+1. Fonksiyonu seç
+2. `Ctrl+Shift+D` tuşuna bas
+3. JSDoc yorumu otomatik olarak fonksiyonun üstüne eklenir
+
+**Hata açıkla:**
+1. Hata mesajını veya bozuk kodu seç
+2. Sağ tık → CodeSense 🧠 → Hatayı Açıkla
+3. Sade Türkçe açıklama sağ alt köşede belirir
+
+---
+
+## 📁 Proje Yapısı
+
+```
+codesense/
+├── src/
+│   ├── extension.ts        ← Giriş noktası, 4 komutu kayıt eder
+│   └── gemini.service.ts   ← Gemini API istemcisi, prompt'lar, temizleme
+├── out/                    ← Derlenmiş JavaScript (otomatik oluşturulur)
+├── package.json            ← Eklenti manifestosu, komutlar, menüler, kısayollar
+├── tsconfig.json
+└── .vscodeignore
+```
+
+---
+
+## ⚙️ Yapılandırma
+
+| Ayar | Açıklama | Varsayılan |
+|---|---|---|
+| `codesense.geminiApiKey` | Google Gemini API anahtarın | `""` |
+
+---
+
+## 🚧 Sınırlamalar
+
+- Ücretsiz Gemini API dakikada 15 istek limiti vardır. Limite ulaşırsan 1 dakika bekle.
+- Gemini API'ye bağlanmak için aktif internet bağlantısı gerekir.
+- Üretilen kodlar production'a almadan önce mutlaka gözden geçirilmelidir.
+
+---
+
+## 🗺 Yol Haritası
+
+- [ ] Satır içi kod önerileri (ghost text)
+- [ ] Çok dosyalı bağlam desteği
+- [ ] Daha fazla dil desteği (Python, Go, Rust)
+- [ ] Yerel model desteği (Ollama)
+- [ ] Özelleştirilebilir prompt ayarları paneli
+
+---
+
+## 🤝 Katkı
+
+Pull request'ler memnuniyetle karşılanır. Büyük değişiklikler için önce bir issue aç, ne yapmak istediğini tartışalım.
+
+---
+
+## 📄 Lisans
+
+[MIT](LICENSE)
+
+---
+
+<p align="center">❤️ ve fazla kahveyle yapıldı</p>
