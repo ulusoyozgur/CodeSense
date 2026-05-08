@@ -4,18 +4,22 @@
   "description": "AI-powered Swiss Army knife for JS, Next.js and Java developers",
   "version": "0.0.1",
   "publisher": "your-publisher-id",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["Other"],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
       "title": "CodeSense",
       "properties": {
-        "codesense.geminiApiKey": {
+        "codesense.groqApiKey": {
           "type": "string",
           "default": "",
-          "description": "Gemini API anahtarınızı buraya girin. Google AI Studio'dan alabilirsiniz: https://aistudio.google.com"
+          "description": "Groq API anahtarınızı buraya girin. console.groq.com/keys adresinden ücretsiz alabilirsiniz."
         }
       }
     },
@@ -94,16 +98,16 @@
     "package": "vsce package"
   },
   "devDependencies": {
-    "@types/vscode": "^1.85.0",
+    "@types/mocha": "^10.0.0",
     "@types/node": "20.x",
+    "@types/vscode": "^1.85.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
-    "eslint": "^8.56.0",
-    "typescript": "^5.3.3",
     "@vscode/vsce": "^2.22.0",
-    "@types/mocha": "^10.0.0"
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.7.0"
+    "groq-sdk": "^1.1.2"
   }
 }

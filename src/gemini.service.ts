@@ -1,22 +1,20 @@
 import * as vscode from "vscode";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
-// API anahtarını VS Code ayarlarından güvenli şekilde alır
 function getApiKey(): string {
   const key = vscode.workspace
     .getConfiguration("codesense")
-    .get<string>("geminiApiKey");
+    .get<string>("groqApiKey");
 
   if (!key || key.trim() === "") {
     throw new Error(
-      "Gemini API anahtarı bulunamadı. " +
-        "Lütfen Ayarlar > CodeSense > Gemini Api Key alanını doldurun."
+      "Groq API anahtarı bulunamadı. " +
+        "Lütfen Ayarlar > CodeSense > Groq Api Key alanını doldurun."
     );
   }
   return key.trim();
 }
 
-// Markdown kod bloklarını temizler (```js ... ``` → düz metin)
 function cleanResponse(text: string): string {
   return text
     .replace(/```[\w]*\n?/g, "")
@@ -24,32 +22,28 @@ function cleanResponse(text: string): string {
     .trim();
 }
 
-// Tüm komutların kullandığı tek nokta: koda prompt gönder, cevap al
 export async function askGemini(
   systemInstruction: string,
   userCode: string
 ): Promise<string> {
   const apiKey = getApiKey();
-  const genAI = new GoogleGenerativeAI(apiKey);
+  const groq = new Groq({ apiKey });
 
-  const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash-latest", 
-    systemInstruction: {
-      role: "user",
-      parts: [{ text: systemInstruction }],
-    },
+  const response = await groq.chat.completions.create({
+    model: "llama-3.3-70b-versatile",
+    messages: [
+      { role: "system", content: systemInstruction },
+      { role: "user", content: userCode },
+    ],
   });
 
-  const result = await model.generateContent(userCode);
-  const response = result.response.text();
-  return cleanResponse(response);
+  const text = response.choices[0]?.message?.content ?? "";
+  return cleanResponse(text);
 }
-
-// --- Komutlara özel yardımcı fonksiyonlar ---
 
 export async function explainError(selectedText: string): Promise<string> {
   return askGemini(
-    `Sen deneyimli bir yazılım geliştiricisin. 
+    `Sen deneyimli bir yazılım geliştiricisin.
 Kullanıcı sana bir hata mesajı veya hatalı kod parçası gösterecek.
 Şunları yap:
 1. Hatanın ne anlama geldiğini SADECe Türkçe, teknik terim kullanmadan açıkla.
@@ -71,7 +65,7 @@ export async function generateDocumentation(
 Kullanıcının verdiği fonksiyon veya metot için ${isJava ? "Javadoc" : "JSDoc"} formatında yorum bloğu yaz.
 - Fonksiyonun ne yaptığını açıkla
 - Her parametreyi (@param) belgele
-- Dönüş değerini (@returns) belgele  
+- Dönüş değerini (@returns) belgele
 - Sadece yorum bloğunu yaz, kodu tekrarlama
 - ${isJava ? "@param ve @return" : "@param ve @returns"} etiketlerini kullan
 - Açıklamalar Türkçe olsun`,

@@ -32,6 +32,9 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.askGemini = askGemini;
 exports.explainError = explainError;
@@ -39,43 +42,38 @@ exports.generateDocumentation = generateDocumentation;
 exports.reviewAndOptimize = reviewAndOptimize;
 exports.generateComponent = generateComponent;
 const vscode = __importStar(require("vscode"));
-const generative_ai_1 = require("@google/generative-ai");
-// API anahtarını VS Code ayarlarından güvenli şekilde alır
+const groq_sdk_1 = __importDefault(require("groq-sdk"));
 function getApiKey() {
     const key = vscode.workspace
         .getConfiguration("codesense")
-        .get("geminiApiKey");
+        .get("groqApiKey");
     if (!key || key.trim() === "") {
-        throw new Error("Gemini API anahtarı bulunamadı. " +
-            "Lütfen Ayarlar > CodeSense > Gemini Api Key alanını doldurun.");
+        throw new Error("Groq API anahtarı bulunamadı. " +
+            "Lütfen Ayarlar > CodeSense > Groq Api Key alanını doldurun.");
     }
     return key.trim();
 }
-// Markdown kod bloklarını temizler (```js ... ``` → düz metin)
 function cleanResponse(text) {
     return text
         .replace(/```[\w]*\n?/g, "")
         .replace(/```/g, "")
         .trim();
 }
-// Tüm komutların kullandığı tek nokta: koda prompt gönder, cevap al
 async function askGemini(systemInstruction, userCode) {
     const apiKey = getApiKey();
-    const genAI = new generative_ai_1.GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash-latest",
-        systemInstruction: {
-            role: "user",
-            parts: [{ text: systemInstruction }],
-        },
+    const groq = new groq_sdk_1.default({ apiKey });
+    const response = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+            { role: "system", content: systemInstruction },
+            { role: "user", content: userCode },
+        ],
     });
-    const result = await model.generateContent(userCode);
-    const response = result.response.text();
-    return cleanResponse(response);
+    const text = response.choices[0]?.message?.content ?? "";
+    return cleanResponse(text);
 }
-// --- Komutlara özel yardımcı fonksiyonlar ---
 async function explainError(selectedText) {
-    return askGemini(`Sen deneyimli bir yazılım geliştiricisin. 
+    return askGemini(`Sen deneyimli bir yazılım geliştiricisin.
 Kullanıcı sana bir hata mesajı veya hatalı kod parçası gösterecek.
 Şunları yap:
 1. Hatanın ne anlama geldiğini SADECe Türkçe, teknik terim kullanmadan açıkla.
@@ -89,7 +87,7 @@ async function generateDocumentation(selectedText, language) {
 Kullanıcının verdiği fonksiyon veya metot için ${isJava ? "Javadoc" : "JSDoc"} formatında yorum bloğu yaz.
 - Fonksiyonun ne yaptığını açıkla
 - Her parametreyi (@param) belgele
-- Dönüş değerini (@returns) belgele  
+- Dönüş değerini (@returns) belgele
 - Sadece yorum bloğunu yaz, kodu tekrarlama
 - ${isJava ? "@param ve @return" : "@param ve @returns"} etiketlerini kullan
 - Açıklamalar Türkçe olsun`, selectedText);
